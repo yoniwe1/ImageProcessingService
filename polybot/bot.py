@@ -63,7 +63,8 @@ class Bot:
     def handle_message(self, msg):
         """Bot Main message handler"""
         logger.info(f'Incoming message: {msg}')
-        self.send_text(msg['chat']['id'], f'Your original message: {msg["text"]}')
+        if "text" in msg:
+            self.send_text(msg['chat']['id'], f'Your original message: {msg["text"]}')
 
 
 class QuoteBot(Bot):
@@ -75,4 +76,34 @@ class QuoteBot(Bot):
 
 
 class ImageProcessingBot(Bot):
-    pass
+    def handle_message(self, msg):
+        logger.info(f'Incoming message: {msg}')
+        if "photo" in msg:
+            if msg['caption'] is not None:
+                my_img_path = self.download_user_photo(msg)
+                img = Img(my_img_path)
+                match msg['caption']:
+                    case "Blur":
+                        img.blur()
+                    case "Contour":
+                        img.contour()
+                    case "Rotate":
+                        img.rotate()
+                    case "Segment":
+                        img.segment()
+                    case "Salt and pepper":
+                        img.salt_n_pepper()
+                    case "Concat":
+                        img.concat(img)
+
+                filtered_img_path = img.save_img()
+                self.send_photo(msg['chat']['id'], filtered_img_path)
+        else:
+            if "text" in msg:
+                self.send_text(msg['chat']['id'], f'Your original message: {msg["text"]}')
+
+
+
+
+
+
