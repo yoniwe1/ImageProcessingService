@@ -13,6 +13,7 @@ def index():
     return 'Ok'
 
 
+
 @app.route(f'/{TELEGRAM_TOKEN}/', methods=['POST'])
 def webhook():
     req = request.get_json()
